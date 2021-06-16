@@ -16,6 +16,8 @@ import sys
 
 
 class SiameseModel:
+    LOSS_TYPE = ['binary_crossentropy', 'contrastive']
+    BACKBONE_TYPE = ['vgg', 'resnet']
     def __init__(self, input_shape, network="vgg", loss="binary_crossentropy"):
 
         self.input_shape = input_shape
@@ -77,11 +79,13 @@ class SiameseModel:
 
         distance = Lambda(self.euclidean_distance)([featsA, featsB])
 
-        outputs = Dense(1, activation="sigmoid")(distance)
-        self.model = Model(inputs=[imgA, imgB], outputs=outputs)
-
-        self.model.compile(loss=self.loss, optimizer="adam", metrics=["accuracy"])
-
+        if self.loss == "binary_crossentropy":
+            outputs = Dense(1, activation="sigmoid")(distance)
+            self.model = Model(inputs=[imgA, imgB], outputs=outputs)
+            self.model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+        elif self.loss == "contrastive":
+            self.model = Model(inputs=[imgA, imgB], outputs=distance)
+            self.model.compile(loss=self.contrastive_loss, optimizer="adam", metrics=["accuracy"])
 
     def train(self, dataset, batch_size=16, epochs=50, path_save="./best_weights.h5"):
 

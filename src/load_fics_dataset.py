@@ -12,7 +12,7 @@ from sklearn import utils
 rd.seed(28)
 
 class LoadFics:
-
+    
     def __init__(self, train_size, dataset_path):  # 5, 10, 20
 
         if train_size not in [5, 10, 20]:
@@ -118,6 +118,40 @@ class LoadFics:
 
         return pairTrain, labelTrain, pairVal, labelVal
 
+    def get_train_dataset(self):
+        x_train = []
+        y_train = []
+
+        for _class in self.dataset.keys():
+
+            for img_train in self.dataset[_class][self.train_mode]:
+                path_train = os.path.join(self.dataset_path, _class, img_train)
+                img = self.__get_image(path_train)
+
+                x_train.append(img)
+                y_train.append(self.dataset[_class]["class_id"])
+
+        
+        x_train = np.array(x_train)
+        y_train = np.array(y_train)
+        
+        return x_train, y_train
+    
+    def get_test_dataset(self):
+        x_test_path = []
+        y_test = []
+
+        for _class in self.dataset.keys():
+
+            for img_test in self.dataset[_class]["test_set"]:
+                path_img_test = os.path.join(self.dataset_path, _class, img_test)
+                x_test_path.append(path_img_test)
+                y_test.append(self.dataset[_class]["class_id"])
+
+        
+        y_test = np.array(y_test)
+        
+        return x_test_path, y_test
 
 
 

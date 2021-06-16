@@ -12,9 +12,9 @@ def create_dataset_file(dataset_path, output_file="./fibs_data_split.json"):
 
     dataset = {}
 
-    max_files = 32
+    #max_files = 32
 
-    val_size = test_size = abs(max_files-20)//2
+    val_size = 10#abs(max_files-20)//2
 
     for idx, _class in enumerate(classes):
 
