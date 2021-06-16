@@ -1,6 +1,7 @@
 import os
 import random as rd
 import json
+import matplotlib.pyplot as plt
 
 def create_dataset_file(dataset_path, output_file="./fibs_data_split.json"):
 
@@ -44,3 +45,15 @@ def create_dataset_file(dataset_path, output_file="./fibs_data_split.json"):
     file = open(output_file, "w+")
     json.dump(dataset, file, indent=4)
     file.close()
+
+def plot_training(H, plotPath="./train_plot.png"):
+
+    plt.style.use("ggplot")
+    plt.figure()
+    plt.plot(H.history["loss"], label="train_loss")
+    plt.plot(H.history["val_loss"], label="val_loss")
+    plt.title("Training Loss")
+    plt.xlabel("Epoch #")
+    plt.ylabel("Loss")
+    plt.legend(loc="lower left")
+    plt.savefig(plotPath)
