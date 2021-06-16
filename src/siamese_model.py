@@ -20,6 +20,7 @@ class SiameseModel:
 
         self.input_shape = input_shape
         self.network = network
+        self.model = None
 
     def get_model(self):
 
@@ -75,25 +76,16 @@ class SiameseModel:
         distance = Lambda(self.euclidean_distance)([featsA, featsB])
 
         outputs = Dense(1, activation="sigmoid")(distance)
-        model = Model(inputs=[imgA, imgB], outputs=outputs)
+        self.model = Model(inputs=[imgA, imgB], outputs=outputs)
 
-        model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+        self.model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
 
-        return model
 
-    def plot_training(self, H, plotPath="./train_plot.png"):
+    def train(self, dataset, batch_size=16, epochs=50, path_save="./best_weights.h5"):
 
-        plt.style.use("ggplot")
-        plt.figure()
-        plt.plot(H.history["loss"], label="train_loss")
-        plt.plot(H.history["val_loss"], label="val_loss")
-        plt.title("Training Loss")
-        plt.xlabel("Epoch #")
-        plt.ylabel("Loss")
-        plt.legend(loc="lower left")
-        plt.savefig(plotPath)
-
-    def train(self, model, dataset, batch_size=16, epochs=50, path_save="./best_weights.h5"):
+        if self.model == None:
+            print("Please, build your model first...")
+            sys.exit()
 
         pairTrain, labelTrain, pairVal, labelVal = dataset
 
@@ -103,7 +95,7 @@ class SiameseModel:
                                        verbose=1,
                                        save_best_only=True)
 
-        history = model.fit(
+        history = self.model.fit(
             [pairTrain[:, 0], pairTrain[:, 1]], labelTrain[:],
             validation_data=([pairVal[:, 0], pairVal[:, 1]], labelVal[:]),
             batch_size=batch_size,

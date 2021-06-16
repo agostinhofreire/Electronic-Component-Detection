@@ -1,6 +1,6 @@
 import os
 import cv2
-from fics_utils import create_dataset_file
+from src.utils import create_dataset_file
 import sys
 import json
 import numpy as np
@@ -20,6 +20,7 @@ class LoadFics:
             sys.exit()
 
         if not os.path.exists("./fibs_data_split.json"):
+            print("Json file not found, creating...")
             create_dataset_file(dataset_path)
 
         file = open("./fibs_data_split.json", "r")
@@ -121,19 +122,15 @@ class LoadFics:
 
 
 
-if __name__ == '__main__':
-    loader = LoadFics(
-        train_size=5,
-        dataset_path="/home/agostinho/PyCharm/Siamese/data_fics"
-    )
-
-    pairTrain, labelTrain, pairVal, labelVal = loader.load()
-
-    print(pairTrain.shape)
-    print(labelTrain.shape)
-    print(pairVal.shape)
-    print(labelVal.shape)
-    # print(len(pairTrain))
-    # print(len(labelTrain))
-    # print(len(pairVal))
-    # print(len(labelVal))
+# if __name__ == '__main__':
+#     loader = LoadFics(
+#         train_size=5,
+#         dataset_path="/home/agostinho/PyCharm/Siamese/data_fics"
+#     )
+#
+#     pairTrain, labelTrain, pairVal, labelVal = loader.load()
+#
+#     print(pairTrain.shape)
+#     print(labelTrain.shape)
+#     print(pairVal.shape)
+#     print(labelVal.shape)
