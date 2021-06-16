@@ -3,30 +3,41 @@ from src.siamese_model import SiameseModel
 from src.utils import plot_training
 from src.evaluate_model import evaluate_model
 
-loader = LoadFics(
-        train_size=5,
-        #dataset_path="/home/agostinho/PyCharm/Siamese/data_fics"
-        dataset_path = "D:\\PCBs Datasets\\FICS PCB\\FICS_CROPS_V3"
-    )
+for network in ["vgg", "resnet"]:
+    for loss in ["binary_crossentropy", "contrastive"]:
+        for train_size in [5, 10, 20]:
 
-dataset = loader.load() #pairTrain, labelTrain, pairVal, labelVal
 
-siamese = SiameseModel(
-    input_shape=(224, 224, 3),
-    network="vgg",
-    loss="binary_crossentropy"
-)
-siamese.build()
+            file_name = f"{network}_{loss}_{train_size}"
 
-history = siamese.train(
-    dataset=dataset,
-    batch_size=16,
-    epochs=50,
-    path_save="./vgg_best_model.h5"
-)
+            print("Starting", file_name)
 
-plot_training(history)
+            loader = LoadFics(
+                    train_size=train_size,
+                    dataset_path="/home/agostinho/PyCharm/Siamese/data_fics"
+                )
 
-x_train, y_train = loader.get_train_dataset()
-x_test_path, y_test = loader.get_test_dataset()
-cm, class_metrics = evaluate_model(siamese, x_train, y_train, x_test_path, y_test, './vgg_binary.txt')
+            dataset = loader.load() #pairTrain, labelTrain, pairVal, labelVal
+
+            siamese = SiameseModel(
+                input_shape=(224, 224, 3),
+                network=network,
+                loss=loss
+            )
+            siamese.build()
+
+            history = siamese.train(
+                dataset=dataset,
+                batch_size=16,
+                epochs=50,
+                path_save=f"./results/{file_name}.h5",
+                path_log=f"./results/{file_name}.log"
+            )
+
+            plot_training(history, f"./results/{file_name}.png")
+
+            # siamese.model.load_weights(f"./results/{file_name}.h5")
+            #
+            # x_train, y_train = loader.get_train_dataset()
+            # x_test_path, y_test = loader.get_test_dataset()
+            # cm, class_metrics = evaluate_model(siamese.model, x_train, y_train, x_test_path, y_test, f'./results/{file_name}.txt')
