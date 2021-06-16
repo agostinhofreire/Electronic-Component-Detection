@@ -9,7 +9,11 @@ loader = LoadFics(
 
 dataset = loader.load() #pairTrain, labelTrain, pairVal, labelVal
 
-siamese = SiameseModel((224, 224, 3), "resnet")
+siamese = SiameseModel(
+    input_shape=(224, 224, 3),
+    network="vgg",
+    loss="binary_crossentropy"
+)
 siamese.build()
 
 history = siamese.train(

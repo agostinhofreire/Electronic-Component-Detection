@@ -16,11 +16,13 @@ import sys
 
 
 class SiameseModel:
-    def __init__(self, input_shape, network="vgg"):
+    def __init__(self, input_shape, network="vgg", loss="binary_crossentropy"):
 
         self.input_shape = input_shape
         self.network = network
         self.model = None
+
+        self.loss = loss
 
     def get_model(self):
 
@@ -78,7 +80,7 @@ class SiameseModel:
         outputs = Dense(1, activation="sigmoid")(distance)
         self.model = Model(inputs=[imgA, imgB], outputs=outputs)
 
-        self.model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+        self.model.compile(loss=self.loss, optimizer="adam", metrics=["accuracy"])
 
 
     def train(self, dataset, batch_size=16, epochs=50, path_save="./best_weights.h5"):
