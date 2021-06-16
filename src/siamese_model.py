@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import GlobalAveragePooling2D, BatchNormalization, Flatten
 from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.layers import Lambda
-from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger
 import tensorflow.keras.backend as K
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -83,11 +83,12 @@ class SiameseModel:
             outputs = Dense(1, activation="sigmoid")(distance)
             self.model = Model(inputs=[imgA, imgB], outputs=outputs)
             self.model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+
         elif self.loss == "contrastive":
             self.model = Model(inputs=[imgA, imgB], outputs=distance)
             self.model.compile(loss=self.contrastive_loss, optimizer="adam", metrics=["accuracy"])
 
-    def train(self, dataset, batch_size=16, epochs=50, path_save="./best_weights.h5"):
+    def train(self, dataset, batch_size=16, epochs=50, path_save="./best_weights.h5", path_log="./training.log"):
 
         if self.model == None:
             print("Please, build your model first...")
@@ -101,19 +102,14 @@ class SiameseModel:
                                        verbose=1,
                                        save_best_only=True)
 
+        csv_logger = CSVLogger(path_log)
+
         history = self.model.fit(
             [pairTrain[:, 0], pairTrain[:, 1]], labelTrain[:],
             validation_data=([pairVal[:, 0], pairVal[:, 1]], labelVal[:]),
             batch_size=batch_size,
             epochs=epochs,
-            callbacks=[checkpointer]
+            callbacks=[checkpointer, csv_logger]
         )
 
         return history
-
-
-
-if __name__ == '__main__':
-    siamese = SiameseModel((224, 224, 3), "vgg")
-    model = siamese.build()
-    print(model.summary())
