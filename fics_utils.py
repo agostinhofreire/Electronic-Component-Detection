@@ -2,11 +2,9 @@ import os
 import random as rd
 import json
 
-def create_dataset_file(output_file="./fibs_data_split.json"):
+def create_dataset_file(dataset_path, output_file="./fibs_data_split.json"):
 
     rd.seed(28)
-
-    dataset_path = "./data_fics"
 
     classes = os.listdir(dataset_path)
     classes.sort()

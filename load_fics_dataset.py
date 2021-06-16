@@ -7,6 +7,7 @@ import numpy as np
 import random as rd
 import math
 from itertools import combinations_with_replacement
+from sklearn import utils
 
 rd.seed(28)
 
@@ -19,7 +20,7 @@ class LoadFics:
             sys.exit()
 
         if not os.path.exists("./fibs_data_split.json"):
-            create_dataset_file()
+            create_dataset_file(dataset_path)
 
         file = open("./fibs_data_split.json", "r")
         self.dataset = json.load(file)
@@ -112,7 +113,8 @@ class LoadFics:
         pairTrain, labelTrain = self.__make_pairs(x_train, y_train)
         pairVal, labelVal = self.__make_pairs(x_val, y_val)
 
-        # return x_train, y_train, x_val, y_val
+        pairTrain, labelTrain = utils.shuffle(pairTrain, labelTrain)
+
         return pairTrain, labelTrain, pairVal, labelVal
 
 
@@ -122,12 +124,16 @@ class LoadFics:
 if __name__ == '__main__':
     loader = LoadFics(
         train_size=5,
-        dataset_path="/home/agostinho/PyCharm/Siamese/fics_preprocessing/data_fics"
+        dataset_path="/home/agostinho/PyCharm/Siamese/data_fics"
     )
 
     pairTrain, labelTrain, pairVal, labelVal = loader.load()
 
-    print(len(pairTrain))
-    print(len(labelTrain))
-    print(len(pairVal))
-    print(len(labelVal))
+    print(pairTrain.shape)
+    print(labelTrain.shape)
+    print(pairVal.shape)
+    print(labelVal.shape)
+    # print(len(pairTrain))
+    # print(len(labelTrain))
+    # print(len(pairVal))
+    # print(len(labelVal))
