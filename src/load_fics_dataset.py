@@ -15,8 +15,8 @@ class LoadFics:
     
     def __init__(self, train_size, dataset_path):  # 5, 10, 20
 
-        if train_size not in [5, 10, 20]:
-            print("Please choose a valid train_size -> [5, 10, 20]")
+        if train_size not in [5, 10, 15]:
+            print("Please choose a valid train_size -> [5, 10, 15]")
             sys.exit()
 
         if not os.path.exists("./fibs_data_split.json"):
@@ -30,7 +30,7 @@ class LoadFics:
         mode = {
             5: "5_shot_set",
             10: "10_shot_set",
-            20: "20_shot_set"
+            15: "15_shot_set"
         }
 
         self.train_mode = mode[train_size]
@@ -75,6 +75,14 @@ class LoadFics:
 
         return x_train, y_train, x_val, y_val
 
+    def __get_other_elements(self, indexes, j):
+        other_elements = []
+
+        for idx, _list in enumerate(indexes):
+            if idx != j:
+                other_elements += list(_list)
+
+        return other_elements
 
     def __make_pairs(self, images, labels):
 
@@ -83,20 +91,25 @@ class LoadFics:
 
         numClasses = len(np.unique(labels))
         indexes_class = [np.where(labels == i)[0] for i in range(0, numClasses)]
+
         for i, class_elements in enumerate(indexes_class):
             comb = combinations_with_replacement(class_elements,
                                                  2)  # combine with replacement all elements of the same class
             qtde_same_image = 0
             for pair in list(comb):
-                pairImages.append([images[pair[0]], images[pair[1]]])
-                pairLabels.append([1])
-                qtde_same_image = qtde_same_image + 1
+                if pair[0] != pair[1]:
+                    pairImages.append([images[pair[0]], images[pair[1]]])
+                    pairLabels.append([1])
+                    qtde_same_image = qtde_same_image + 1
 
-            qde_min_pair = math.floor(qtde_same_image / (numClasses - 1))
-            qde_max_pair = math.ceil(qtde_same_image / (numClasses - 1))
+            qde_min_pair = math.floor(qtde_same_image / (numClasses))
+            qde_max_pair = math.ceil(qtde_same_image / (numClasses))
+
             for j in range(i + 1, numClasses):
                 qtde_pair = rd.randint(qde_min_pair, qde_max_pair)
-                other_class_elements = rd.sample(list(indexes_class[j]), qtde_pair)
+
+                # other_class_elements = rd.sample(list(indexes_class[j]), qtde_pair)
+                other_class_elements = rd.sample(self.__get_other_elements(indexes_class, j), qtde_pair)
                 current_class_elements = rd.sample(list(class_elements), qtde_pair)
 
                 for k in range(qtde_pair):

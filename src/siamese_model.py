@@ -88,7 +88,7 @@ class SiameseModel:
             self.model = Model(inputs=[imgA, imgB], outputs=distance)
             self.model.compile(loss=self.contrastive_loss, optimizer="adam", metrics=["accuracy"])
 
-    def train(self, dataset, batch_size=16, epochs=50, path_save="./best_weights.h5", path_log="./training.log"):
+    def train(self, dataset, batch_size=16, epochs=50, verbose=1, path_save="./best_weights.h5", path_log="./training.log"):
 
         if self.model == None:
             print("Please, build your model first...")
@@ -99,7 +99,7 @@ class SiameseModel:
 
         checkpointer = ModelCheckpoint(filepath=path_save,
                                        monitor='val_loss',
-                                       verbose=1,
+                                       verbose=verbose,
                                        save_best_only=True)
 
         csv_logger = CSVLogger(path_log)
@@ -109,7 +109,8 @@ class SiameseModel:
             validation_data=([pairVal[:, 0], pairVal[:, 1]], labelVal[:]),
             batch_size=batch_size,
             epochs=epochs,
-            callbacks=[checkpointer, csv_logger]
+            callbacks=[checkpointer, csv_logger],
+            verbose=verbose
         )
 
         return history

@@ -2,10 +2,16 @@ from src.load_fics_dataset import LoadFics
 from src.siamese_model import SiameseModel
 from src.utils import plot_training
 from src.evaluate_model import evaluate_model
+import os
 
-for network in ["vgg", "resnet"]:
+
+
+if not os.path.exists("./results"):
+    os.makedirs("./results")
+
+for network in ["vgg"]:
     for loss in ["binary_crossentropy", "contrastive"]:
-        for train_size in [5, 10, 20]:
+        for train_size in [5, 10, 15]:
 
 
             file_name = f"{network}_{loss}_{train_size}"
@@ -30,11 +36,15 @@ for network in ["vgg", "resnet"]:
                 dataset=dataset,
                 batch_size=16,
                 epochs=50,
+                verbose=1,
                 path_save=f"./results/{file_name}.h5",
                 path_log=f"./results/{file_name}.log"
             )
 
             plot_training(history, f"./results/{file_name}.png")
+
+            del loader
+            del siamese
 
             # siamese.model.load_weights(f"./results/{file_name}.h5")
             #

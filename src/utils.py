@@ -26,16 +26,16 @@ def create_dataset_file(dataset_path, output_file="./fibs_data_split.json"):
             "class_id": idx,
             "5_shot_set": [],
             "10_shot_set": [],
-            "20_shot_set": [],
+            "15_shot_set": [],
             "val_set": [],
             "test_set": []
             }
 
         temp_sets["5_shot_set"] = images[:5]
         temp_sets["10_shot_set"] = images[:10]
-        temp_sets["20_shot_set"] = images[:20]
-        temp_sets["val_set"] = images[20:20+val_size]
-        temp_sets["test_set"] = images[20+val_size:]
+        temp_sets["15_shot_set"] = images[:15]
+        temp_sets["val_set"] = images[15:15+val_size]
+        temp_sets["test_set"] = images[15+val_size:]
 
         if _class not in dataset.keys():
             dataset[_class] = temp_sets
