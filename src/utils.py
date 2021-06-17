@@ -2,6 +2,8 @@ import os
 import random as rd
 import json
 import matplotlib.pyplot as plt
+import sys
+import cv2
 
 def create_dataset_file(dataset_path, output_file="./fibs_data_split.json"):
 
@@ -57,3 +59,37 @@ def plot_training(H, plotPath="./train_plot.png"):
     plt.ylabel("Loss")
     plt.legend(loc="lower left")
     plt.savefig(plotPath)
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_training_images(dataset_path, save_path="./train_images.png"):
+    modes = {
+            5: "5_shot_set",
+            10: "10_shot_set",
+            15: "15_shot_set"
+        }
+    if not os.path.exists("./fibs_data_split.json"):
+        print("Json file data split not found.")
+        sys.exit(1)
+
+    file = open("./fibs_data_split.json", "r")
+    dataset_split = json.load(file)
+    file.close()
+
+    for num_images in modes:
+        mode = modes[num_images]
+        fig=plt.figure(figsize=(16, 16))
+        plt.grid(False)
+        plt.axis('off')
+        plt.legend(loc=mode)
+        columns = num_images
+        rows = len(dataset_split.keys())
+        i = 1
+        for _class in dataset_split.keys():
+            for img in dataset_split[_class][mode]:
+                img = cv2.imread(os.path.join(dataset_path,_class,img))
+                fig.add_subplot(rows, columns, i)
+                plt.imshow(img)
+                i = i + 1
+        plt.show()

@@ -78,14 +78,13 @@ class SiameseModel:
         featsB = featureExtractor(imgB)
 
         distance = Lambda(self.euclidean_distance)([featsA, featsB])
+        normal_layer = BatchNormalization()(distance)
+        output_layer = Dense(1, activation="sigmoid")(normal_layer)
+        self.model = Model(inputs=[imgA, imgB], outputs=output_layer)
 
         if self.loss == "binary_crossentropy":
-            outputs = Dense(1, activation="sigmoid")(distance)
-            self.model = Model(inputs=[imgA, imgB], outputs=outputs)
             self.model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
-
         elif self.loss == "contrastive":
-            self.model = Model(inputs=[imgA, imgB], outputs=distance)
             self.model.compile(loss=self.contrastive_loss, optimizer="adam", metrics=["accuracy"])
 
     def train(self, dataset, batch_size=16, epochs=50, verbose=1, path_save="./best_weights.h5", path_log="./training.log"):
@@ -95,7 +94,6 @@ class SiameseModel:
             sys.exit()
 
         pairTrain, labelTrain, pairVal, labelVal = dataset
-
 
         checkpointer = ModelCheckpoint(filepath=path_save,
                                        monitor='val_loss',
